@@ -1,0 +1,11 @@
+sqlplus METRO/METROPWD@civicadb.cbv7b5a3wfcm.us-east-1.rds.amazonaws.com/ORCL
+sqlplus civica_deb/cbEApACxq0GmR@civicadb.cbv7b5a3wfcm.us-east-1.rds.amazonaws.com/ORCL
+
+sqlplus civica_deb/cbEApACxq0GmR as sysdba@civicadb.cbv7b5a3wfcm.us-east-1.rds.amazonaws.com/ORCL
+
+
+
+
+connect SYS/<el_pasword_de_sys> AS SYSDBA;
+connect / as sysdba
+sqlplus / AS SYSDBA@civicadb.cbv7b5a3wfcm.us-east-1.rds.amazonaws.com/ORCL

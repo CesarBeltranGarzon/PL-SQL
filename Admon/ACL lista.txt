@@ -1,0 +1,22 @@
+SELECT * from dba_network_acls;
+SELECT *  FROM   dba_network_acl_privileges;
+
+-- 1
+BEGIN
+ DBMS_NETWORK_ACL_ADMIN.APPEND_HOST_ACE
+ (
+ host => '192.168.0.13',
+ lower_port => null,
+ upper_port => null,
+ ace => xs$ace_type(privilege_list => xs$name_list('jdwp'),
+ principal_name => 'METRO',
+ principal_type => xs_acl.ptype_db)
+ );
+END;
+
+
+
+GRANT DEBUG CONNECT SESSION TO METRO;
+GRANT EXECUTE ON DBMS_DEBUG_JDWP TO METRO;
+
+GRANT DEBUG ANY PROCEDURE TO METRO;
