@@ -1,0 +1,64 @@
+SELECT DISTINCT a.name, a.owner
+  FROM all_source a
+WHERE a.owner IN ('ODS_CO','STG_CO','APPS_CO')
+   AND a.NAME IN ('INS_CENCONSUDA2',
+                'PKG_ALFA_ENTITIES_FULL',
+                'PKG_ALFA_ENTITIES_FULL_PARAM',
+                'PKG_CATALOGO_PRODUCTOS_DIARIO',
+                'PKG_DOMINIOS_PERU',
+                'PKG_DQ_AJUSTES',
+                'PKG_DQ_AUTOMATION',
+                'PKG_EXEC_ESTABILIZE_TEST',
+                'PKG_INFORME_ALFA',
+                'PKG_LND_CEX_EMISIONES',
+                'PKG_LND_CEX_EMISIONES',
+                'PKG_LND_DOMINIOS_PERU',
+                'PKG_LND_LIQ_DEVOLUCIONES',
+                'PKG_LND_POLICIES',
+                'PKG_LND_POLICIES_BCO',
+                'PKG_LND_POLICIES_CENCOSUD',
+                'PKG_LND_POLICIES_HIST',
+                'PKG_LND_RPT_SINS_ATM',
+                'PKG_LND_RPT_SINS_ATM_AV_VILLAS',
+                'PKG_LND_RPT_TABLEAU',
+                'PKG_LOAD_CATALOGO_PRODUCTOS',
+                'PKG_LOAD_EBILLING',
+                'PKG_LOAD_EBILLING_MASIVE',
+                'PKG_LOAD_LND_POLICIES',
+                'PKG_LOAD_LND_POLICIES_ODM',
+                'PKG_ODS_ANALYTICS_CAMPAIGNS',
+                'PKG_ODS_CONTROL_TASK_VIGENTES',
+                'PKG_ODS_DAILY_POLCLOS_RULES',
+                'PKG_ODS_EMISSIONS_INFO',
+                'PKG_ODS_LEONISA',
+                'PKG_ODS_LOAD_EBILLING_AUT_NC',
+                'PKG_RPT_ACTIVE_CANCELLED',
+                'PKG_SARLAFT',
+                'PKG_SARLAFT_JULIO',
+                'PKG_STG_CANCELLATION',
+                'PKG_UTILITIES',
+                'PKG_UTILITY',
+                'REPORT_CENCOSUD',
+                'SP_EXTRACCION_BASE_SAC',
+                'SP_EXTRACCION_BASE_SAC_DIARIO',
+                'SP_UPD_POL_VERSION_POLICIES',
+                'SP_UPDATE_COV_LND',
+                'TMP_MERGE_ANA')
+   AND (UPPER(a.TEXT) LIKE '%STG_WRK_COBERTURA_VALOR%'
+       OR UPPER(a.TEXT) LIKE '%COBERTURA_VALOR_ASEG%'
+       OR UPPER(a.TEXT) LIKE '%STG_WRK_MATRIZ_VALORES%'
+       OR UPPER(a.TEXT) LIKE '%ODS_MATRIZ_VALORES_ASEGURADOS%'--
+       OR UPPER(a.TEXT) LIKE '%STG_WRK_CATALOGO_PRODUCT%'
+       OR UPPER(a.TEXT) LIKE '%ODS_CATALOGO_PRODUCTOS%'--
+       OR UPPER(a.TEXT) LIKE '%STG_WRK_CATALOGO_ECOSISTEMAS%'
+       OR UPPER(a.TEXT) LIKE '%CATALOGO_PRODUCTOS_ECOSISTEMAS%'
+       OR UPPER(a.TEXT) LIKE '%STG_PRODUCT_ASSISTS%'
+       OR UPPER(a.TEXT) LIKE '%ODS_PRODUCT_ASSISTANCES%'
+       OR UPPER(a.TEXT) LIKE '%STG_DEDUCTIBLE_SUBLIMITS%'
+       OR UPPER(a.TEXT) LIKE '%ODS_DEDUCTIBLES%')
+   AND EXISTS ( SELECT 1
+                  FROM all_source b
+                 WHERE b.owner = a.owner
+                   AND b.name  = a.name
+                   AND LOWER(b.text) LIKE '%lnd_policies%' )
+ORDER BY 1

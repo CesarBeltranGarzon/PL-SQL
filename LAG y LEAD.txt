@@ -1,0 +1,1 @@
+SELECT LAG(id) OVER(ORDER BY date) anterior, LEAD(id) OVER(ORDER BY date) posterior FROM CLAIM;

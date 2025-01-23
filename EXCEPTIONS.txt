@@ -1,0 +1,106 @@
+-- Excepciones
+-------------------
+-- De forma predeterminada, cualquier error encontrado en un programa PL/SQL detiene la ejecución del programa. Puede detectar y recuperarse de errores utilizando una sección EXCEPTION.
+-- Las excepciones de una cláusula WHEN pueden ser definidas por el usuario o incorporadas. Las excepciones definidas por el usuario se pueden definir en la sección DECLARE del bloque actual o su bloque circundante, o en la sección DECLARE de un paquete PL/SQL. La sintaxis PRAGMA EXCEPTION_INIT o PRAGMA DB2_EXCEPTION_INIT se puede utilizar inmediatamente después de la definición de una excepción, especificando el sqlcode o sqlstate que corresponde a la excepción definida por el usuario.
+
+DECLARE
+  exception1 EXCEPTION;
+  exception2 EXCEPTION;
+  PRAGMA EXCEPTION_INIT(exception2,-942);
+  exception3 EXCEPTION;
+  PRAGMA DB2_EXCEPTION_INIT(exception3,'42601');
+BEGIN
+  MyApp.Main(100);
+EXCEPTION
+  WHEN exception1 THEN
+      DBMS_OUTPUT.PUT_LINE('User-defined exception1 caught');
+  WHEN exception2 THEN
+      DBMS_OUTPUT.PUT_LINE('User-defined exception2 (Undefined name) caught');
+  WHEN exception3 THEN
+      DBMS_OUTPUT.PUT_LINE('User-defined exception3 (Syntax error) caught');
+END
+
+
+
+
+--
+-- RAISE
+-- La sentencia RAISE emite una excepción definida anteriormente.
+
+CREATE OR REPLACE PROCEDURE raise_demo (inval NUMBER) IS
+  evenno EXCEPTION;
+  oddno  EXCEPTION;
+BEGIN
+  IF MOD(inval, 2) = 1 THEN
+    RAISE oddno;
+  ELSE
+    RAISE evenno;
+  END IF;
+EXCEPTION
+  WHEN evenno THEN
+    dbms_output.put_line(TO_CHAR(inval) || ' is even');
+  WHEN oddno THEN
+    dbms_output.put_line(TO_CHAR(inval) || ' is odd');
+END raise_demo;
+
+
+--
+-- RAISE_APPLICATION_ERROR
+-- El procedimiento RAISE_APPLICATION_ERROR genera una excepción basada en un código de error y un mensaje proporcionados por el usuario. Este procedimiento sólo está soportado en contextos PL/SQL.
+
+CREATE OR REPLACE PROCEDURE verify_emp (
+    p_empno         NUMBER
+)
+IS
+    v_ename         emp.ename%TYPE;
+    v_job           emp.job%TYPE;
+    v_mgr           emp.mgr%TYPE;
+    v_hiredate      emp.hiredate%TYPE;
+BEGIN
+    SELECT ename, job, mgr, hiredate
+        INTO v_ename, v_job, v_mgr, v_hiredate FROM emp
+        WHERE empno = p_empno;
+    IF v_ename IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20010, 'No name for ' || p_empno);
+    END IF;
+    IF v_job IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20020, 'No job for' || p_empno);
+    END IF;
+    IF v_mgr IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20030, 'No manager for ' || p_empno);
+    END IF;
+    IF v_hiredate IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20040, 'No hire date for ' || p_empno);
+    END IF;
+    DBMS_OUTPUT.PUT_LINE('Employee ' || p_empno ||
+        ' validated without errors');
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('SQLCODE: ' || SQLCODE);
+        DBMS_OUTPUT.PUT_LINE('SQLERRM: ' || SQLERRM);
+END;
+
+CALL verify_emp(7839);
+
+SQLCODE: -438
+SQLERRM: SQL0438N  Application raised error or warning with
+ diagnostic text: "No manager for 7839".  SQLSTATE=UD030
+
+
+Tabla 1. Nombres de excepción incorporados
+Nombre de excepción
+Descripción
+CASE_NO_ENCONTRADO	Ninguno de los casos de una sentencia CASE se evalúa como "true" y no hay ninguna condición ELSE.
+CURSOR_ALREADY_OPEN	Se ha intentado abrir un cursor que ya está abierto.
+DUP_VAL_ON_INDEX	Hay valores duplicados para la clave de índice.
+CURSOR no válido	Se ha intentado acceder a un cursor no abierto.
+NÚMERO_NO válido	El valor numérico no es válido.
+INICIO_SESIÓN denegado	El nombre de usuario o la contraseña no son válidos.
+NO_DATA_FOUND	No hay filas que cumplan los criterios de selección.
+NOT_LOGGED_ON	No hay ninguna conexión con la base de datos.
+OTROS	Para cualquier excepción que no haya sido capturada por una condición anterior en la sección de excepción.
+RECUENTO_SUSCRIPCIÓN_BEYOND_TOTAL	Un índice de matriz está fuera de rango o no existe.
+LÍMITE_OUTSIDE_SUSCRIPCIÓN	El tipo de datos de una expresión de índice de matrices no es asignable al tipo de índice de matrices.
+TOO_MANY_ROWS	Más de una fila ha satisfecho los criterios de selección, pero sólo se permite devolver una fila.
+VALOR_ERROR	El valor no es válido.
+DIVIDIR_CERO	Se ha intentado realizar una división por cero.

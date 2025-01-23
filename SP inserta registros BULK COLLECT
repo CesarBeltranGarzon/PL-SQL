@@ -1,0 +1,89 @@
+create or replace PROCEDURE       bulk_movimento_sessao_prueba AS
+  
+  CURSOR cur IS
+   SELECT * FROM metro.movimento_sessao ms
+   WHERE NOT EXISTS( SELECT 1 
+                       FROM metro.movimento_sessao_prueba msp
+                      WHERE msp.mos_id = ms.mos_id);
+
+  TYPE t_bulk_collect_tabla IS TABLE OF metro.movimento_sessao%ROWTYPE;
+
+  l_tab   t_bulk_collect_tabla := t_bulk_collect_tabla();
+  l_start NUMBER;
+
+BEGIN
+
+  --------------------------------
+  -- Time bulk population Cursor.  
+  --------------------------------
+  l_start := DBMS_UTILITY.get_time;
+
+  OPEN cur;
+  LOOP
+
+    FETCH cur BULK COLLECT
+      INTO l_tab LIMIT 100000;
+
+    -- Actualiza tabla
+    FORALL i IN 1 .. l_tab.count
+      INSERT INTO metro.movimento_sessao_prueba
+      ( MOS_ID,
+        TMO_ID,
+        OSI_ID,
+        SES_ID,
+        SMS_ID,
+        MOS_DTA,
+        MOS_F4,
+        MOS_VLR_TOTAL,
+        FPG_ID,
+        SBD_ID,
+        TCO_ID,
+        MOS_FACTURA,
+        MOS_CONTABILIZADA,
+        RES_ID,
+        POS_SEQ,
+        LOTE_ID,
+        ID_SES_CRUZADA,
+        ID_TIPO_REGISTRO_F4,
+        ID_CARGA_ARCHIVO,
+        MULTI_INTEGRADA,
+        VENTA_SALIDA,
+        REC_ID,
+        PFA_ID )
+      VALUES
+      ( l_tab(i).MOS_ID,
+        l_tab(i).TMO_ID,
+        l_tab(i).OSI_ID,
+        l_tab(i).SES_ID,
+        l_tab(i).SMS_ID,
+        l_tab(i).MOS_DTA,
+        l_tab(i).MOS_F4,
+        l_tab(i).MOS_VLR_TOTAL,
+        l_tab(i).FPG_ID,
+        l_tab(i).SBD_ID,
+        l_tab(i).TCO_ID,
+        l_tab(i).MOS_FACTURA,
+        l_tab(i).MOS_CONTABILIZADA,
+        l_tab(i).RES_ID,
+        l_tab(i).POS_SEQ,
+        l_tab(i).LOTE_ID,
+        l_tab(i).ID_SES_CRUZADA,
+        l_tab(i).ID_TIPO_REGISTRO_F4,
+        l_tab(i).ID_CARGA_ARCHIVO,
+        l_tab(i).MULTI_INTEGRADA,
+        l_tab(i).VENTA_SALIDA,
+        l_tab(i).REC_ID,
+        l_tab(i).PFA_ID );
+        
+        COMMIT;
+
+    EXIT WHEN cur%NOTFOUND;
+  END LOOP;
+
+  CLOSE cur;
+  COMMIT;
+
+  DBMS_OUTPUT.put_line('Bulk    (' || l_tab.count || ' rows): ' ||
+                       (DBMS_UTILITY.get_time - l_start));
+
+END bulk_movimento_sessao_prueba;

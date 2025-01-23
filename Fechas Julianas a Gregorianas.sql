@@ -1,0 +1,1 @@
+SELECT trunc(to_date(substr(2018365,1,4),'yyyy'),'yyyy') + substr(2018365,5)-1 FROM DUAL

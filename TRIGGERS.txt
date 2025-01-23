@@ -1,0 +1,79 @@
+--
+-- TRIGGERS
+--
+Triggers en PL/SQL
+Un Trigger en PLSQL es un tipo especial de procedimiento almacenado asociado con una tabla de la base de datos Oracle y que se "dispara" (is triggered) cada vez que se ejecuta sobre dicha tabla una sentencia INSERT, una sentencia UPDATE o una sentencia DELETE, es decir, es un procedimiento que permite realizar distintas operaciones cuando un registro de una tabla Oracle es actualizado o borrado, o cuando se añade un registro nuevo a dicha tabla.
+
+
+
+Tipos de triggers PLSQL
+------------------------
+Los triggers PLSQL pueden actuar antes o después de que se realice una inserción, un borrado o una actualización de un registro de la tabla Oracle involucrada.
+
+Se pueden definir triggers PL/SQL diferentes para cada tipo de evento (INSERT, UPDATE, DELETE) pero lo más lógico es crear un único trigger para todos los eventos y usar una sentencia IF para distinguir que acción realizar dependiendo del evento.
+
+Por otro lado los triggers pueden ser a nivel de registro (row) o a nivel de sentencia (statement).
+
+- A nivel de registro o fila el trigger PL/SQL se ejecuta cada vez que un registro es actualizado, insertado o borrado.
+
+- A nivel de sentencia, el trigger se ejecuta una vez que la sentencia PL/SQL INSERT, UPDATE o INSERT se completa. Obviamente en este caso el trigger sólo puede ser ejecutado después (AFTER) de que se ejecute dicha sentencia.
+
+
+Ventajas de los triggers PL/SQL
+----------------------------------
+Estandarización: Un solo procedimiento controla las acciones que pueden realizar el resto de procedimientos sobre una tabla Oracle específica.
+
+Eficiencia: Cuando un trigger es analizado por el optimizador Oracle, el plan de ejecución se almacena en la memoria virtual del servidor, con lo cual, si se vuelve a disparar el trigger PLSQL, este se ejecuta instantáneamente ya que existe una copia del plan de ejecución en la memoria.
+
+Seguridad: Aumentan la seguridad porque permiten restringir el acceso de los usuarios a los datos de las tablas, al no poder éstos modificar o acceder a los mismos directamente. Las acciones que realiza un trigger normalmente se limitan en base a los permisos que tiene el usuario que creo la tabla involucrada y no en base a los permisos que tiene el usuario que disparó el trigger.
+
+Los triggers PL/SQL constituyen una potente herramienta para mantener la integridad de la base de datos, ya que pueden llevar a cabo cualquier acción que sea necesaria para el mantenimiento de dicha integridad.
+
+
+
+
+CREATE TABLE emp (
+    name            VARCHAR2(10),
+    deptno          NUMBER,
+    sal             NUMBER,
+    comm            NUMBER
+)
+/
+
+CREATE TABLE exception (
+    name            VARCHAR2(10),
+    old_sal         NUMBER,
+    new_sal         NUMBER
+)
+/
+
+
+
+
+CREATE OR REPLACE TRIGGER emp_comm_trig
+    BEFORE INSERT OR UPDATE ON emp
+    FOR EACH ROW
+BEGIN
+    IF (:NEW.deptno = 30 and INSERTING) THEN
+        :NEW.comm := :NEW.sal * .4;
+    END IF;
+
+    IF (UPDATING and (:NEW.sal - :OLD.sal) > :OLD.sal * .5) THEN
+       INSERT INTO exception VALUES (:NEW.name, :OLD.sal, :NEW.sal);
+    END IF;
+END
+/
+
+
+
+Avoiding Mutating triggers
+-----------------------------
+The Oracle mutating trigger error occurs when a trigger references the table that owns the trigger, resulting in the "ORA-04091: table name is mutating, trigger/function may not see it.
+
+-Don't use triggers - The best way to avoid the mutating table error is not to use triggers.  While the object-oriented Oracle provides "methods" that are associated with tables, most savvy PL/SQL developers avoid triggers unless absolutely necessary.
+ 
+-Use an "after" or "instead of" trigger - If you must use a trigger, it's best to avoid the mutating table error by using an "after" trigger, to avoid the currency issues associated with a mutating table.  For example, using a trigger ":after update on xxx", the original update has completed and the table will not be mutating.
+ 
+-Re-work the trigger syntax - Dr. Hall has some great notes on mutating table errors, and offers other ways to avoid mutating tables with a combination of row-level and statement-level triggers.
+ 
+-Use autonomous transactions - You can avoid the mutating table error by marking your trigger as an autonomous transaction, making it independent from the table that calls the procedure.

@@ -1,0 +1,66 @@
+------------------------------
+-- Transacciones autónomas
+------------------------------
+The AUTONOMOUS_TRANSACTION pragma changes the way a subprogram works within a transaction. A subprogram marked with this pragma can do SQL operations and commit or roll back those operations, without committing or rolling back the data in the main transaction.
+
+El pragma AUTONOMOUS_TRANSACTION cambia la forma en que funciona un subprograma dentro de una transacción. Un subprograma marcado con este pragma puede realizar operaciones SQL y confirmar o revertir esas operaciones, sin confirmar ni revertir los datos en la transacción principal.
+Hacer COMMIT o ROLLBACK en este bloque autónomo afecta sólo a las operaciones realizadas dentro del mismo. Las operaciones externas siguen pendientes de confirmación.
+
+Puedes aplicar este pragma a:
+
+-Bloques PL/SQL anónimos de nivel superior (no anidados)
+-Funciones y procedimientos locales, independientes y empaquetados
+-Métodos de un tipo de objeto SQL
+-Triggers de base de datos
+
+No puede aplicar este pragma a un paquete completo o a un tipo de objeto completo.
+
+Puede codificar el pragma en cualquier parte de la sección declarativa. Para facilitar la lectura, codifique el pragma en la parte superior de la sección.
+
+--------------
+Example 1
+--------------
+--The following example marks a packaged function as autonomous:
+
+CREATE PACKAGE banking AS
+   FUNCTION balance (acct_id INTEGER) RETURN REAL;
+END banking;
+/
+
+CREATE PACKAGE BODY banking AS
+   FUNCTION balance (acct_id INTEGER) RETURN REAL IS
+      PRAGMA AUTONOMOUS_TRANSACTION;
+      my_bal REAL;
+   BEGIN
+      NULL;
+   END;
+END banking;
+/
+
+--------------
+Example 2
+--------------
+--The following example lets a trigger issue transaction control statements:
+
+CREATE TABLE anniversaries AS
+   SELECT DISTINCT TRUNC(hire_date) anniversary FROM employees;
+ALTER TABLE anniversaries ADD PRIMARY KEY (anniversary);
+
+CREATE TRIGGER anniversary_trigger
+   BEFORE INSERT ON employees FOR EACH ROW
+DECLARE
+   PRAGMA AUTONOMOUS_TRANSACTION;
+BEGIN
+   INSERT INTO anniversaries VALUES(TRUNC(:new.hire_date));
+-- Only commits the preceding INSERT, not the INSERT that fired
+-- the trigger.
+   COMMIT;
+   EXCEPTION
+-- If someone else was hired on the same day, we get an exception
+-- because of duplicate values. That's OK, no action needed.
+      WHEN OTHERS THEN NULL;
+END;
+/
+
+DROP TRIGGER anniversary_trigger;
+DROP TABLE anniversaries;

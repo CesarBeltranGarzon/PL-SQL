@@ -1,0 +1,4 @@
+SELECT procedure_name
+  FROM all_procedures
+ WHERE owner = 'ODS_CO'
+   AND object_name = 'PKG_LOAD_LND_POLICIES'

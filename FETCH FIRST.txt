@@ -1,0 +1,17 @@
+/*
+You want to display 5 percent of the rows from the SALES table for products with the lowest
+AMOUNT_SOLD
+and also want to include the rows that have the same AMOUNT_SOLD even if this causes the output to
+exceed 5 percent of the rows.
+*/
+
+SELECT prod_id, cust_id, amount_sold
+FROM sales
+ORDER BY amount_sold
+FETCH FIRST 5 PERCENT ROWS WITH TIES;
+
+-- Primeros 5 registros 
+SELECT prod_id, cust_id, amount_sold
+FROM sales
+ORDER BY amount_sold
+FETCH FIRST 5 ROWS ONLY;

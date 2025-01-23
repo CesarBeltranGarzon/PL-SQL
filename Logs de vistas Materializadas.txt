@@ -1,0 +1,17 @@
+-------------------------------------
+-- Logs de vistas materializadas
+-------------------------------------
+CREATE MATERIALIZED VIEW LOG ON orders
+  PCTFREE 5
+  TABLESPACE example
+  STORAGE (INITIAL 10K)
+  PURGE REPEAT INTERVAL '5' DAY;
+  
+  
+ CREATE MATERIALIZED VIEW LOG ON sales 
+   WITH ROWID, SEQUENCE(amount_sold, time_id, prod_id)
+   INCLUDING NEW VALUES; 
+   
+  CREATE MATERIALIZED VIEW LOG ON product_information 
+   WITH ROWID, SEQUENCE (list_price, min_price, category_id), PRIMARY KEY
+   INCLUDING NEW VALUES;

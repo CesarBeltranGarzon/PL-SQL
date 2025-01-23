@@ -1,0 +1,11 @@
+Los JOINs en SQL sirven para combinar filas de dos o más tablas basándose en un campo común entre ellas, devolviendo por tanto datos de diferentes tablas. Un JOIN se produce cuando dos o más tablas se juntan en una sentencia SQL.
+
+Existen más tipos de joins en SQL que los que aquí se explican, como CROSS JOIN, O SELF JOIN, pero no todos ellos están soportados por todos los sistemas de bases de datos. Los más importantes son los siguientes:
+
+INNER JOIN: Devuelve todas las filas cuando hay al menos una coincidencia en ambas tablas.
+LEFT JOIN: Devuelve todas las filas de la tabla de la izquierda, y las filas coincidentes de la tabla de la derecha.
+RIGHT JOIN: Devuelve todas las filas de la tabla de la derecha, y las filas coincidentes de la tabla de la izquierda.
+OUTER JOIN: Devuelve todas las filas de las dos tablas, la izquierda y la derecha. También se llama FULL OUTER JOIN.  Aparecerá null en cada una de las tablas alternativamente cuando no haya una coincidencia.
+
+CROSS JOIN: produce todas las combinaciones posibles de registros de todas las tablas, puede ser una operación peligrosa para las tablas que contienen muchos registros.
+SELF JOIN:  Una autounión, como su nombre lo indica, une una tabla consigo misma. Para utilizar una autounión, la tabla debe contener una columna (llámese X) que actúe como clave primaria, y otra columna (llámese Y) que almacene valores que puedan coincidir con los valores de la columna X. Los valores de las columnas X e Y no tienen por qué ser los mismos para una fila determinada, y el valor de la columna Y puede ser incluso null.

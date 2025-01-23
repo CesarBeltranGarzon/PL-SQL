@@ -1,0 +1,118 @@
+--
+-- Cursores en PL/SQL
+-- 
+
+Los cursores se utilizan en PL/SQL para manejar las sentencias SELECT. Un cursor esta formado por un conjunto de registros devueltos por una instrucción SQL del tipo SELECT. Desde un punto de visto interno a la base de datos Oracle, los cursores son segmentos de memoria utilizados para realizar operaciones con los registros devueltos tras ejecutar una sentencia SELECT.
+
+Cursores PL/SQL
+Se pueden distinguir dos tipos de cursores:
+
+Cursores PLSQL implícitos (No son controlados por el programador)
+---------------------------
+Los cursores implícitos see utilizan cuando la sentencia SELECT devuelve un solo registro y su formato es como sigue:
+
+     DECLARE
+       lsalario empleados.salario%TYPE;
+       ldni empleados.dni%TYPE;
+     BEGIN
+       SELECT salario, dni
+       INTO lsalario, ldni
+       FROM empleados
+       WHERE nombre = 'Juan'
+       AND apellidos = 'Rodrigo Comas';
+       /* Resto de sentencias del bloque */
+     END;
+	 
+Nota: Mucha gente considera que las sentencias UPDATE, dentro de un bloque PLSQL, son también cursores implícitos, no obstante, yo prefiero no incluirlas dentro de este concepto.
+
+
+Cursores PLSQL explícitos (Son controlados por el programador)
+---------------------------
+Los cursores explícitos se utilizan cuando la sentencia SELECT puede devolver varios registros. También se pueden utilizar en consultas que devuelvan un solo registro por razones de eficiencia con respecto a los cursores implícitos, eficiencia que mejorará especialmente si el cursor explícito se tiene que ejecutar varias veces dentro del bloque de código PL/SQL.
+
+Un cursor explícito tiene que ser definido previamente como cualquier otra variable PLSQL y debe serle asignado un nombre. Veamos un ejemplo que muestra el DNI y el salario de los trabajadores incluidos en la tabla empleados:
+
+     DECLARE
+       CURSOR cemp IS
+       SELECT salario, dni
+       FROM empleados;
+       cepm_rec cemp%ROWTYPE;
+     BEGIN
+       FOR cemp_rec IN cemp
+       LOOP
+         DBMS_OUTPUT.PUT_LINE
+           (cemp_rec.dni || ' ' || cemp_rec.salario);
+       END LOOP;
+     END;
+
+Los cursores explícitos admiten el uso de parámetros. Los parámetros deben declararse junto con el cursor. Por ejemplo:
+
+     DECLARE
+       CURSOR cemp(pnombre IN VARCHAR2) IS
+       SELECT salario, dni
+       FROM empleados
+       WHERE nombre = pnombre;
+       cepm_rec cemp%ROWTYPE;
+       vnombre VARCHAR2(20);
+     BEGIN
+       vnombre := 'Juan';
+       DBMS_OUTPUT.PUT_LINE
+         ('Sueldo de los empleados con nombre ' || vnombre);
+       FOR cemp_rec IN cemp(vnombre)
+       LOOP
+         DBMS_OUTPUT.PUT_LINE
+           (cemp_rec.dni || ' ' || cemp_rec.salario);
+       END LOOP;
+     END;
+	 
+En los ejemplos anteriores los cursores se han controlado con la sentencia FOR pero también pueden controlarse mediante el uso de las sentencias OPEN, FETCH y CLOSE. La sentencia OPEN identifica el cursor que se tiene que utilizar. La sentencia FETCH pone, registro a registro, los valores devueltos por el cursor en las variables correspondientes, variables que pueden estar constituidas por una lista de variables o un registro PLSQL (este es el caso de los ejemplos que incluyo en este artículo). Por último, la sentencia CLOSE cierra el cursor y libera la memoria reservada. Veamos como quedaría nuestro ejemplo utilizando este tipo de sentencias en lugar de utilizar la sentencia FOR:
+
+     DECLARE
+       CURSOR cemp(pnombre IN VARCHAR2) IS
+       SELECT salario, dni
+       FROM empleados
+       WHERE nombre = pnombre;
+       cepm_rec cemp%ROWTYPE;
+       vnombre VARCHAR2(20);
+     BEGIN
+       vnombre := 'Juan';
+       DBMS_OUTPUT.PUT_LINE
+         ('Sueldo de los empleados con nombre ' || vnombre);
+       OPEN cemp(vnombre);
+       LOOP
+         FETCH cemp INTO cemp_rec;
+         EXIT WHEN cemp%NOTFOUND; -- Último registro.
+         DBMS_OUTPUT.PUT_LINE
+           (cemp_rec.dni || ' ' || cemp_rec.salario);
+       END LOOP;
+       DBMS_OUTPUT.PUT_LINE
+         ('Número de empleados procesados ' || cemp%ROWCOUNT);
+       CLOSE cemp;
+     END;
+
+Sólo me queda señalar que existe una tercera opción para manejar cursores que a mí, particularmente, no me gusta utilizar pero que no quiero omitir:
+
+     DECLARE
+       TYPE ecursor IS REF CURSOR RETURN empleados%ROWTYPE;
+       cemp ecursor;
+       cepm_rec empleados%ROWTYPE;
+     BEGIN
+       OPEN cemp FOR SELECT * FROM empleados;
+       FOR cemp_rec IN cemp
+       LOOP
+         DBMS_OUTPUT.PUT_LINE
+           (cemp_rec.dni || ' ' || cemp_rec.salario);
+       END LOOP;
+     END;
+	 
+	 
+	 
+
+Attributos de control de los cursores PLSQL explícitos
+------------------------------------------------------------
+Finalmente sólo mencionar que existen cuatro tipos de atributos que nos permiten controlar la ejecución de un cursor:
+
+%ISOPEN: Devuelve "true" si el cursor está abierto.
+%FOUND: Devuelve "true" si el registro fue satisfactoriamente procesado.
+%NOTFOUND: Devuelve "true" si el registro no pudo ser procesado. Normalmente esto ocurre cuando ya se han procesado todos los registros devueltos por el cursor.
+%ROWCOUNT: Devuelve el número de registros que han sido procesados hasta ese momento.

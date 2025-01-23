@@ -1,0 +1,22 @@
+SELECT line, type, full_text
+  FROM all_statements
+ WHERE object_name = 'PKG_LOAD_LND_POLICIES' -- Tu paquete o SP
+  AND object_type = 'PACKAGE BODY' -- Tipo
+   AND owner       = 'ODS_CO' -- Esquema
+   AND UPPER(full_text) LIKE '%LND_POLICIES%'
+   AND ( UPPER(full_text) LIKE '%INSERT%'
+         OR UPPER(full_text) LIKE '%UPDATE%'
+         OR UPPER(full_text) LIKE '%MERGE%' )
+   AND ( UPPER(full_text) LIKE '%POL_CURRENCY_TYPE%'
+         OR UPPER(full_text) LIKE '%POL_BEGIN_MIGRATION%'
+         OR UPPER(full_text) LIKE '%POL_PARTNER_NUMBER%'
+         OR UPPER(full_text) LIKE '%PRD_COLLECTION_TYPE%'
+         OR UPPER(full_text) LIKE '%POL_VERSION%'
+         OR UPPER(full_text) LIKE '%PRD_PERIODICITY_PREMIUM%'
+         OR UPPER(full_text) LIKE '%POL_FINANCIAL_PRD_TYPE%'
+         OR UPPER(full_text) LIKE '%PCO_COMERCIAL_NAME%'
+         OR UPPER(full_text) LIKE '%POL_SUB_THR_ID%'
+         OR UPPER(full_text) LIKE '%POL_SUB_THR_NAME%'
+         OR UPPER(full_text) LIKE '%POL_CHANNEL%'
+         OR UPPER(full_text) LIKE '%POL_CHANNEL_NAME%')
+ORDER BY line

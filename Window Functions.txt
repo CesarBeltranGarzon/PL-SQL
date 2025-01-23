@@ -1,0 +1,38 @@
+Window Function
+---------------------
+es una función que utiliza valores de una o varias filas para devolver un valor para cada fila.  Esto contrasta con una función agregada, que devuelve un valor único para varias filas.
+Se diferencia de una función agregada en que usa una clausula OVER.
+
+Ejemplo: aquí hay una consulta que utiliza una función de ventana para comparar el salario de cada empleado con el salario promedio de su departamento.
+SELECT depname, empno, salary, avg(salary) OVER (PARTITION BY depname) FROM empsalary;
+
+Tipos de funciones de Windows
+--------------------------------
+Funciones de Windows agregadas
+SUM()
+MAX()
+MIN()
+AVG()
+COUNT()
+
+Funciones de clasificación de Windows
+RANK().       Otorga un rango o categoría única a cada registro en función de un valor específico, Ej: 1, 2, 3, 3, 5
+DENSE_RANK(). Es idéntica a la función RANK() excepto que no omite ningún rango. Ej: 1, 2, 3, 3, 4
+ROW_NUMBER(). Asigna un número de fila único a cada registro.
+NTILE().      En qué percentil (o cuartil, o cualquier otra subdivisión) cae una fila determinada.
+
+
+SELECT order_id,order_date,customer_name,city, order_amount,
+NTILE(4) OVER(ORDER BY order_amount) [row_number]
+FROM [dbo].[Orders]
+
+
+
+Funciones de valores de Windows
+LAG().          Fila Anterior
+LEAD().         Fila Siguiente
+FIRST_VALUE().  Identifica el primer registro dentro de una partición o tabla completa si no se especifica PARTITION BY.
+LAST_VALUE().   Identificar el último registro dentro de una partición o tabla completa si no se especifica PARTITION BY.
+
+
+SELECT LAG(id) OVER(ORDER BY date) anterior, LEAD(id) OVER(ORDER BY date) posterior FROM CLAIM;
