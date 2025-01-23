@@ -1,0 +1,57 @@
+--select * FROM DBA_JOBS;
+--select 'exec dbms_ijob.broken('||job||',true);' from dba_jobs;
+
+BEGIN
+  
+ sys.dbms_ijob.broken(4001,true);
+ sys.dbms_ijob.broken(4002,true);
+ sys.dbms_ijob.broken(7,true);
+ sys.dbms_ijob.broken(192,true);
+ sys.dbms_ijob.broken(26,true);
+ sys.dbms_ijob.broken(101,true);
+ sys.dbms_ijob.broken(102,true);
+ sys.dbms_ijob.broken(109,true);
+ sys.dbms_ijob.broken(112,true);
+ sys.dbms_ijob.broken(113,true);
+ sys.dbms_ijob.broken(114,true);
+ sys.dbms_ijob.broken(381,true);
+ sys.dbms_ijob.broken(136,true);
+ sys.dbms_ijob.broken(4003,true);
+ sys.dbms_ijob.broken(157,true);
+ sys.dbms_ijob.broken(551,true);
+ sys.dbms_ijob.broken(552,true);
+ sys.dbms_ijob.broken(4,true);
+ sys.dbms_ijob.broken(3,true);
+ sys.dbms_ijob.broken(9,true);
+ sys.dbms_ijob.broken(2,true);
+ sys.dbms_ijob.broken(521,true);
+ sys.dbms_ijob.broken(523,true);
+ sys.dbms_ijob.broken(522,true);
+ sys.dbms_ijob.broken(181,true);
+ sys.dbms_ijob.broken(621,true);
+ sys.dbms_ijob.broken(13,true);
+ sys.dbms_ijob.broken(581,true);
+ sys.dbms_ijob.broken(15,true);
+ sys.dbms_ijob.broken(17,true);
+ sys.dbms_ijob.broken(159,true);
+ sys.dbms_ijob.broken(133,true);
+ sys.dbms_ijob.broken(220,true);
+ sys.dbms_ijob.broken(218,true);
+ sys.dbms_ijob.broken(219,true);
+ sys.dbms_ijob.broken(255,true);
+ sys.dbms_ijob.broken(256,true);
+ sys.dbms_ijob.broken(257,true);
+ sys.dbms_ijob.broken(419,true);
+ sys.dbms_ijob.broken(421,true);
+ sys.dbms_ijob.broken(420,true);
+ sys.dbms_ijob.broken(422,true);
+ sys.dbms_ijob.broken(193,true);
+ sys.dbms_ijob.broken(6,true);
+ sys.dbms_ijob.broken(261,true);
+ sys.dbms_ijob.broken(10,true);
+ sys.dbms_ijob.broken(1,true);
+ sys.dbms_ijob.broken(25,true);
+ sys.dbms_ijob.broken(158,true);
+ 
+ COMMIT;
+END;
